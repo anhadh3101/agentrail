@@ -1,0 +1,30 @@
+{
+  "name": "@codegoat-cli/agentrail",
+  "version": "0.1.0",
+  "description": "macOS sandboxing utilities (dscl user/group management, ACL scoping, child-process re-exec) for CodeGoat CLI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "os": [
+    "darwin"
+  ],
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "codegoat",
+    "sandboxing",
+    "macos"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "typescript": "^7.0.2"
+  }
+}
