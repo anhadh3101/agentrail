@@ -1,8 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import os from 'node:os';
-import { CODEGOAT_GROUP } from './constants';
-import { resolveUsername } from '../username';
+import { resolveUsername, resolveGroup } from '../username';
 
 const MIN_UID = 601;
 const MIN_GID = 701;
@@ -123,7 +122,7 @@ function createRestrictedUser(username: string, uid: number, gid: number): void 
  * Create a user in the Directory Service of the mac device, if it doesn't exist
  *
  * @param username The name of the user (in this case, name of the agent user).
- * Defaults to resolveUsername() (process.env.OS_USER) when omitted.
+ * Defaults to resolveUsername() (process.env.AGENT_USERNAME) when omitted.
  * @returns An object that contains a boolen value
  */
 export function createUserIfNotExists(username?: string): CreateUserResult {
@@ -145,7 +144,7 @@ export function createUserIfNotExists(username?: string): CreateUserResult {
   }
 
 
-  const groupName = CODEGOAT_GROUP;
+  const groupName = resolveGroup();
   const gid = ensureGroup(groupName);
   const uid = nextFreeId(listIds('/Users', 'UniqueID'), MIN_UID);
 

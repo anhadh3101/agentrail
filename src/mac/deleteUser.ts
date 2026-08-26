@@ -1,6 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { CODEGOAT_GROUP } from './constants';
-import { resolveUsername } from '../username';
+import { resolveUsername, resolveGroup } from '../username';
 
 const MIN_UID = 601;
 const MIN_GID = 701;
@@ -34,20 +33,21 @@ function sudoDscl(args: string[]): void {
 
 export function removeUserIfExists(
   username?: string,
-  groupName: string = CODEGOAT_GROUP,
+  groupName?: string,
 ): RemoveUserResult {
   const resolvedUsername = resolveUsername(username);
+  const resolvedGroupName = resolveGroup(groupName);
 
   if (process.platform !== 'darwin') {
     throw new Error('The CodeGoat sandbox user can only be removed on macOS.');
   }
 
-  if (!USERNAME_PATTERN.test(resolvedUsername) || !USERNAME_PATTERN.test(groupName)) {
-    throw new Error(`Invalid username or group name: ${resolvedUsername}, ${groupName}`);
+  if (!USERNAME_PATTERN.test(resolvedUsername) || !USERNAME_PATTERN.test(resolvedGroupName)) {
+    throw new Error(`Invalid username or group name: ${resolvedUsername}, ${resolvedGroupName}`);
   }
 
   const userPath = `/Users/${resolvedUsername}`;
-  const groupPath = `/Groups/${groupName}`;
+  const groupPath = `/Groups/${resolvedGroupName}`;
 
   let userRemoved = false;
   if (dsclExists(userPath)) {
@@ -67,7 +67,7 @@ export function removeUserIfExists(
     const gid = readNumericAttr(groupPath, 'PrimaryGroupID');
     if (gid !== null && gid < MIN_GID) {
       throw new Error(
-        `Refusing to delete group '${groupName}': GID ${gid} is below ${MIN_GID}, ` +
+        `Refusing to delete group '${resolvedGroupName}': GID ${gid} is below ${MIN_GID}, ` +
           'which suggests this is not a CodeGoat-managed group.',
       );
     }
