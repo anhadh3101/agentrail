@@ -1,4 +1,4 @@
-export { resolveUsername, resolveGroup } from './username';
+export { resolveUsername, resolveGroup, resolveAppName } from './username';
 export { createUserIfNotExists } from './mac/createUser';
 export type { CreateUserResult } from './mac/createUser';
 export { removeUserIfExists } from './mac/deleteUser';

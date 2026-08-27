@@ -17,3 +17,14 @@ export function resolveGroup(explicitGroup?: string): string {
   }
   return envGroup;
 }
+
+
+export function resolveAppName(explicitAppName?: string): string {
+  if (explicitAppName) return explicitAppName;
+
+  const appName = process.env.APP_NAME;
+  if (!appName) {
+    throw new Error('Missing required environment variable: APP_NAME');
+  }
+  return appName;
+}
