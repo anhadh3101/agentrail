@@ -8,18 +8,21 @@ const USER_PATH = `/Users/${USER}`;
 const GROUP = 'agentrail-group';
 
 describe('user management', () => {
+  const realPlatform = process.platform;
   const savedEnv = {
     AGENT_GROUP: process.env.AGENT_GROUP,
     SUDO_USER: process.env.SUDO_USER,
   };
 
   beforeEach(() => {
+    Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true });
     process.env.AGENT_GROUP = GROUP;
     process.env.SUDO_USER = 'operator'; // make resolveAdminUser() deterministic
   });
 
   afterEach(() => {
     mock.restoreAll();
+    Object.defineProperty(process, 'platform', { value: realPlatform, configurable: true });
     for (const [k, v] of Object.entries(savedEnv)) {
       if (v === undefined) delete process.env[k];
       else process.env[k] = v;

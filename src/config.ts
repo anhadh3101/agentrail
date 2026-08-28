@@ -4,7 +4,7 @@
  * @returns Name of the user
  */
 export function resolveUsername(explicitUsername?: string): string {
-  if (explicitUsername) return explicitUsername;
+  if (explicitUsername !== undefined) return explicitUsername;
 
   const envUser = process.env.AGENT_USERNAME || 'agentrail';
   return envUser;
@@ -16,7 +16,7 @@ export function resolveUsername(explicitUsername?: string): string {
  * @returns Name of the user group
  */
 export function resolveGroup(explicitGroup?: string): string {
-  if (explicitGroup) return explicitGroup;
+  if (explicitGroup !== undefined) return explicitGroup;
 
   const envGroup = process.env.AGENT_GROUP || 'agentrail-group';
   return envGroup;
@@ -28,8 +28,13 @@ export function resolveGroup(explicitGroup?: string): string {
  * @returns Name of the app
  */
 export function resolveAppName(explicitAppName?: string): string {
-  if (explicitAppName) return explicitAppName;
+  const appName =
+    explicitAppName !== undefined ? explicitAppName : process.env.APP_NAME || 'agentrail';
 
-  const appName = process.env.APP_NAME || 'agentrail'
+  if (appName.includes('/') || appName.includes('\\') || appName === '.' || appName === '..') {
+    throw new Error(
+      `Invalid APP_NAME '${appName}': must be a single directory name with no path separators.`,
+    );
+  }
   return appName;
 }

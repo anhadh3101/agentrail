@@ -141,21 +141,28 @@ export function revokeTraverseGrants(groupName?: string): void {
   const traverseAce = `group:${group} allow search`;
   const targetAce = `group:${group} allow ${TARGET_ACE_PERMS}`;
 
+  // Best-effort: a chmod failure does not stop the sweep, but the dir stays in
+  // state so a later revokeTraverseGrants() can retry the removal.
+  const failedTargets: string[] = [];
   for (const dir of [...state.targetDirs].reverse()) {
     try {
       execFileSync('chmod', ['-R', '-a', targetAce, dir]);
     } catch {
-      // Best-effort cleanup; continue revoking remaining dirs.
+      failedTargets.push(dir);
     }
   }
 
+  const failedTraverse: string[] = [];
   for (const dir of [...state.traverseDirs].reverse()) {
     try {
       execFileSync('chmod', ['-a', traverseAce, dir]);
     } catch {
-      // Best-effort cleanup; continue revoking remaining dirs.
+      failedTraverse.push(dir);
     }
   }
 
-  writeGrantState({ traverseDirs: [], targetDirs: [] });
+  writeGrantState({
+    traverseDirs: failedTraverse.reverse(),
+    targetDirs: failedTargets.reverse(),
+  });
 }

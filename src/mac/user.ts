@@ -118,7 +118,13 @@ export function removeUserIfExists(username?: string): RemoveUserResult {
 
   // Find the uid from the user path and only throw an error if it is null or is one of the packaged users.
   const uid = readNumericAttr(userPath, 'UniqueID');
-  if (uid !== null && uid < MIN_UID) {
+  if (uid === null) {
+    throw new Error(
+      `Refusing to delete '${resolvedUsername}': its UniqueID could not be read, ` +
+        'so it cannot be confirmed as an Agentrail-managed account.',
+    );
+  }
+  if (uid < MIN_UID) {
     throw new Error(
       `Refusing to delete '${resolvedUsername}': UID ${uid} is below ${MIN_UID}, which ` +
         'suggests this is not a Agentrail-managed account.',

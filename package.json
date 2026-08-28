@@ -12,7 +12,7 @@
   ],
   "type": "commonjs",
   "engines": {
-    "node": ">=18"
+    "node": ">=18.13.0"
   },
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "dev": "tsc --watch",
     "prepare": "tsc",
     "test": "tsx --test \"test/**/*.test.ts\"",
-    "test:watch": "tsx --test --watch \"test/**/*.test.ts\""
+    "test:watch": "node --watch --import tsx --test \"test/**/*.test.ts\""
   },
   "keywords": [
     "codegoat",

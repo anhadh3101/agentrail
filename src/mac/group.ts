@@ -106,7 +106,13 @@ export function removeGroupIfExists(groupName?: string): RemoveGroupResult {
 
   // Otherwise read the gid and delete the group.
   const gid = readNumericAttr(groupPath, 'PrimaryGroupID');
-  if (gid !== null && gid < MIN_GID) {
+  if (gid === null) {
+    throw new Error(
+      `Refusing to delete group '${resolvedGroup}': its PrimaryGroupID could not be read, ` +
+        'so it cannot be confirmed as an agentrail-managed group.',
+    );
+  }
+  if (gid < MIN_GID) {
     throw new Error(
       `Refusing to delete group '${resolvedGroup}': GID ${gid} is below ${MIN_GID}, ` +
         'which suggests this is not a Agentrail-managed group.',

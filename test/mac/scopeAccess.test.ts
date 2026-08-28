@@ -87,7 +87,7 @@ describe('scopeAccess grant lifecycle', () => {
       });
     });
 
-    it('keeps going after a chmod failure and still clears state (best-effort cleanup)', () => {
+    it('keeps going after a chmod failure but retains the failed dir for retry', () => {
       fs.mkdirSync(stateDir, { recursive: true });
       fs.writeFileSync(
         stateFile,
@@ -108,7 +108,7 @@ describe('scopeAccess grant lifecycle', () => {
       assert.equal(exec.calls().length, 3); // 2 targets attempted + 1 traverse
       assert.deepEqual(JSON.parse(fs.readFileSync(stateFile, 'utf8')), {
         traverseDirs: [],
-        targetDirs: [],
+        targetDirs: ['/Users/me/projects/two'],
       });
     });
   });
