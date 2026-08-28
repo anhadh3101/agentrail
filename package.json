@@ -11,9 +11,19 @@
     "darwin"
   ],
   "type": "commonjs",
+  "engines": {
+    "node": ">=18.13.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anhadh3101/agentrail.git"
+  },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepare": "tsc",
+    "test": "tsx --test \"test/**/*.test.ts\"",
+    "test:watch": "node --watch --import tsx --test \"test/**/*.test.ts\""
   },
   "keywords": [
     "codegoat",
@@ -22,9 +32,9 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
   "devDependencies": {
     "@types/node": "^26.1.2",
+    "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   }
 }
