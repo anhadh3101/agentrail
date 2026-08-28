@@ -2,9 +2,9 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { resolveGroup, resolveAppName } from '../username';
+import { resolveGroup, resolveAppName } from '../config';
 
-// Dev-mode state file: tracks which dirs got an ACE granted (split by kind — ancestor
+// State file: tracks which dirs got an ACE granted (split by kind — ancestor
 // traverse-only vs. recursive full-access target dir), so revokeTraverseGrants() can find
 // them even from a separate CLI invocation (e.g. `codegoat reset user`). See SYSTEM_SETUP.md.
 const GRANT_STATE_DIR = path.join(os.homedir(), `.${resolveAppName()}`);
@@ -69,6 +69,13 @@ function hasSearchAce(dir: string, group: string): boolean {
   return new RegExp(`group:${group} allow.*search`).test(out);
 }
 
+// Check whether dir already has the full target ACE (all TARGET_ACE_PERMS) for group.
+function hasTargetAce(dir: string, group: string): boolean {
+  const out = execFileSync('ls', ['-lde', dir], { encoding: 'utf8' });
+  const escaped = TARGET_ACE_PERMS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`group:${group} allow ${escaped}`).test(out);
+}
+
 // Check whether dir already has the world-execute (traverse) bit set.
 function isWorldTraversable(dir: string): boolean {
   const mode = fs.statSync(dir).mode;
@@ -89,6 +96,10 @@ function grantTraverse(dir: string, group: string): void {
 // inherit flags so files/subdirs created later under targetDir pick it up too. Records
 // targetDir for later recursive revocation.
 function scopeTargetDirectory(targetDir: string, group: string): void {
+  // Skip if targetDir itself already carries the ACE — avoids stacking duplicates on repeat runs.
+  // (Does not check descendants; -R re-applies to them regardless, which is idempotent.)
+  if (hasTargetAce(targetDir, group)) return;
+
   // Give user complete access to the target directory
   execFileSync('chmod', ['-R', '+a', `group:${group} allow ${TARGET_ACE_PERMS}`, targetDir]);
   // Save the ACE in the JSON file.
